@@ -2,7 +2,10 @@
 using System.Linq;
 using static System.Console;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Data.Sqlite;
 using System.Collections.Generic;
+using System.Diagnostics;
+
 
 
 namespace BasesDeDatos
@@ -11,6 +14,68 @@ namespace BasesDeDatos
     {
         static void Main(string[] args)
         {
+            //Este ejercicio sirve para editar bases de datos añadir datos a tablas.
+            var CadenaDeConexion=new SqliteConnectionStringBuilder();
+            CadenaDeConexion.DataSource=@"C:\SQLite\Northwind.db";
+            using (var conexion=new SqliteConnection(CadenaDeConexion.ConnectionString))
+            {
+                conexion.Open();
+                var CreateTableCMD=conexion.CreateCommand();
+
+                /*
+                CreateTableCMD.CommandText="ALTER TABLE PagingTest ADD FechaYHora datetime";
+                CreateTableCMD.ExecuteNonQuery();
+                WriteLine("campo añadido. Compruébalo");
+                */
+
+                //borro el contenido de toda la tabla
+                CreateTableCMD.CommandText="DELETE FROM PagingTest";
+                CreateTableCMD.ExecuteNonQuery();
+                WriteLine("Limpiando tabla");
+
+                //Método Lento.
+                /*var Temporizador=Stopwatch.StartNew();
+                using(var db=new NorthwindContext())
+                {
+                    for(int i=1;i<=1000;i++)
+                     {
+                         var Prueba=new PagingTest();
+                         Prueba.Id=i;
+                         Prueba.Row=i*2;
+                         Prueba.FechaYHora=DateTime.Now;
+                         db.PagingTest.Add(Prueba);
+                         db.SaveChanges();
+                         if(i%100==0)
+                         {
+                             WriteLine($"Alcanzados los {i}");
+                         }
+                     }
+                }
+                WriteLine($"Temporizador terminado en {Temporizador.ElapsedMilliseconds} ms");
+                */
+                //Método rápido
+                var Temporizador=Stopwatch.StartNew();
+                using(var db=new NorthwindContext())
+                {
+                    for(int i=1;i<=1000;i++)
+                     {
+                         var Prueba=new PagingTest();
+                         Prueba.Id=i;
+                         Prueba.Row=i*2;
+                         Prueba.FechaYHora=DateTime.Now;
+                         db.PagingTest.Add(Prueba);
+                         
+                         if(i%100==0)
+                         {
+                             db.SaveChanges();
+                             WriteLine($"Alcanzados los {i}");
+                         }
+                     }
+                }
+                WriteLine($"Temporizador terminado en {Temporizador.ElapsedMilliseconds} ms");
+            }
+
+
             //Ejercicio1();
             //Ejercicio2();
             //Ejercicio3();

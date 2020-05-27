@@ -10,5 +10,6 @@ namespace BasesDeDatos
         [Key]
         public long Id { get; set; }
         public long Row { get; set; }
+        public DateTime FechaYHora{get;set;}
     }
 }
